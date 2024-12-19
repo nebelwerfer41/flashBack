@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestione Professionisti</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="container">
+      <h1>Gestione Professionisti e Reparti</h1>
+  
+      <!-- Form per inserire professionisti -->
+      <div class="form-container">
+        <input type="text" id="name" placeholder="Nome Professionista">
+        <input type="text" id="role" placeholder="Ruolo">
+        <input type="text" id="department" placeholder="Reparto">
+        <button id="add-professional">Aggiungi Professionista</button>
+      </div>
+  
+      <!-- Importa/Esporta dati -->
+      <div class="form-container">
+        <textarea id="data-textarea" placeholder="Ruolo, Nome, Reparto, Orario"></textarea>
+        <button id="import-data">Importa Dati</button>
+        <button id="export-data">Esporta Dati</button>
+      </div>
+  
+      <!-- Imposta orario per tutti -->
+      <div class="form-container">
+        <input type="time" id="default-time">
+        <button id="set-all-time">Imposta Orario per Tutti</button>
+        <input type="text" id="set-department" placeholder="Reparto">
+        <button id="set-department-time">Imposta Orario per Reparto</button>
+      </div>
+  
+      <!-- Tabella principale -->
+      <table id="main-table">
+        <thead>
+
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  <script src="script.js"></script>
+</body>
+</html>
