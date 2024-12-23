@@ -45,7 +45,7 @@ document.getElementById('set-all-time').addEventListener('click', () => {
     const time = document.getElementById('default-time').value;
     if (time) {
         professionals.forEach(pro => {
-            if (!pro.custom) { // Ignora le celle personalizzate
+            if (!pro.locked) { // Ignora le celle personalizzate
                 pro.time = time;
             }
         });
@@ -59,7 +59,7 @@ document.getElementById('set-department-time').addEventListener('click', () => {
     const department = document.getElementById('set-department').value.trim();
     if (time && department) {
         professionals.forEach(pro => {
-            if (pro.department === department && !pro.custom) { // Ignora le celle personalizzate
+            if (pro.department === department && !pro.locked) { // Ignora le celle personalizzate
                 pro.time = time;
             }
         });
@@ -159,16 +159,6 @@ function renderTable() {
     for (let i = 0; i < maxRows; i++) {
         const row = document.createElement('tr');
 
-        const cellData = columns.flat()[i]; // Colonna piatta per linearità
-        if (cellData && !cellData.isHeader) {
-            const index = professionals.findIndex(pro =>
-                pro.name === cellData.name &&
-                pro.role === cellData.role &&
-                pro.department === cellData.department
-            );
-            row.setAttribute('data-index', index); // Aggiungi l'indice ai dati
-        }
-
         for (let col = 0; col < 3; col++) {
             const cellData = columns[col][i] || null;
 
@@ -184,13 +174,99 @@ function renderTable() {
                 CALL
               </td>`;
                 } else {
-                    row.innerHTML += `
-            <td class="role-cell" data-index="${professionals.indexOf(cellData)}">${cellData.role || ''}</td>
-            <td class="name-cell" data-index="${professionals.indexOf(cellData)}">${cellData.name || ''}</td>
-            <td class="time-cell" data-index="${professionals.indexOf(cellData)}">${cellData.time || ''}</td>`;
+                    const roleCell = document.createElement('td');
+                    roleCell.classList.add('role-cell');
+                    roleCell.textContent = cellData.role || '';
+
+                    const nameCell = document.createElement('td');
+                    nameCell.classList.add('name-cell');
+                    nameCell.textContent = cellData.name || '';
+
+                    const timeCell = document.createElement('td');
+                    timeCell.classList.add('time-cell');
+                    timeCell.dataset.index = professionals.indexOf(cellData);
+                    timeCell.style.position = 'relative';
+
+                    if (cellData.locked) {
+                        timeCell.classList.add('locked');
+                    } else {
+                        timeCell.classList.remove('locked');
+                    }
+
+                    const span = document.createElement('span');
+                    span.textContent = cellData.time || '';
+                    span.style.display = 'inline-block';
+                    span.style.width = '50px'; // Dimensione fissa
+                    span.style.textAlign = 'center';
+
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = cellData.time || '';
+                    input.style.width = '50px'; // Stessa dimensione della cella
+                    input.style.textAlign = 'center';
+                    input.style.display = 'none';
+                    input.maxLength = 5; // Limite di caratteri
+
+                    const lockIcon = document.createElement('span');
+                    lockIcon.textContent = cellData.locked ? '🔒' : '🔓';
+                    lockIcon.classList.add('lock-icon');
+                    lockIcon.style.position = 'absolute';
+                    lockIcon.style.top = '50%';
+                    lockIcon.style.transform = 'translateY(-50%)';
+                    lockIcon.style.display = 'none'; // Mostrato solo con mouseover
+
+                    // Mostra il lucchetto al passaggio del mouse
+                    timeCell.addEventListener('mouseenter', () => {
+                        lockIcon.style.display = 'inline';
+                    });
+
+                    timeCell.addEventListener('mouseleave', () => {
+                        lockIcon.style.display = 'none';
+                    });
+
+                    // Toggle blocco/sblocco
+                    lockIcon.addEventListener('click', (event) => {
+                        event.stopPropagation(); // Previeni conflitti con la modifica
+                        cellData.locked = !cellData.locked;
+                        lockIcon.textContent = cellData.locked ? '🔒' : '🔓';
+                        timeCell.classList.toggle('locked', cellData.locked);
+                    });
+
+                    // Mostra input per la modifica
+                    timeCell.addEventListener('click', () => {
+                        if (!cellData.locked) {
+                            span.style.display = 'none';
+                            input.style.display = 'inline';
+                            input.focus();
+                        }
+                    });
+
+                    // Salva modifica
+                    input.addEventListener('blur', () => {
+                        cellData.time = input.value.trim();
+                        input.style.display = 'none';
+                        span.textContent = cellData.time || '';
+                        span.style.display = 'inline-block';
+                    });
+
+                    input.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') {
+                            cellData.time = input.value.trim();
+                            input.style.display = 'none';
+                            span.textContent = cellData.time || '';
+                            span.style.display = 'inline-block';
+                        }
+                    });
+
+                    timeCell.appendChild(span);
+                    timeCell.appendChild(input);
+                    timeCell.appendChild(lockIcon);
+
+                    row.appendChild(roleCell);
+                    row.appendChild(nameCell);
+                    row.appendChild(timeCell);
                 }
             } else {
-                // Celle vuote per mantenere l'allineamento
                 row.innerHTML += '<td></td><td></td><td></td>';
             }
         }
@@ -199,6 +275,7 @@ function renderTable() {
     }
     addEventListeners();
 }
+
 
 
 // Aggiunge eventi di modifica orario
@@ -225,24 +302,8 @@ function addEventListeners() {
             });
         });
 
-        row.querySelectorAll('td.time-cell:not(.header-cell)').forEach(cell => {
-            cell.addEventListener('click', () => {
-                const newContent = prompt("Inserisci un nuovo valore (orario o testo):", cell.textContent);
-                if (newContent) {
-                    const proIndex = parseInt(cell.getAttribute('data-index'), 10); // Usa data-index
-        
-                    if (!isNaN(proIndex) && professionals[proIndex]) {
-                        professionals[proIndex].time = newContent; // Aggiorna il valore nella struttura dati
-                        professionals[proIndex].custom = true; // Contrassegna come personalizzato
-                        console.log(`Aggiornato professionista:`, professionals[proIndex]); // Log di debug
-                        renderTable(); // Rerender con i dati aggiornati
-                    } else {
-                        console.error("Errore: Indice non valido o professionista non trovato");
-                    }
-                }
-            });
-        });        
-        
+
+
     });
 }
 

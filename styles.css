@@ -3,54 +3,91 @@ body {
     margin: 20px;
     padding: 0;
     background-color: #f4f4f4;
-  }
-  .container {
+}
+
+.container {
     max-width: 1200px;
     margin: 0 auto;
-  }
-  h1 {
+}
+
+h1 {
     text-align: center;
     margin-bottom: 20px;
-  }
-  .form-container {
+}
+
+.form-container {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
-  }
-  input, select, button {
+}
+
+input,
+select,
+button {
     padding: 10px;
     font-size: 16px;
-  }
-  table {
+}
+
+table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
     background-color: #fff;
-  }
-  th, td {
+}
+
+th,
+td {
     border: 1px solid #ddd;
     text-align: center;
     padding: 2px;
     font-size: small;
-  }
-  th {
-    background-color: #f0f0f0;
-  }
-  .highlight {
-    background-color: #f0f8ff;
-  }
+}
 
-  .header-cell {
-    text-align: left; 
-    font-weight: bold; 
+th {
     background-color: #f0f0f0;
-  }
-  .role-cell {
+}
+
+.highlight {
+    background-color: #f0f8ff;
+}
+
+.header-cell {
+    text-align: left;
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+
+.role-cell {
     text-align: right;
-  }
-  .name-cell {
+}
+
+.name-cell {
     text-align: right;
-  }
-  .time-cell {
+}
+
+.time-cell {
     text-align: center;
-  }
+}
+
+.lock-icon {
+    margin-left: 5px;
+    font-size: 16px;
+    color: gray;
+    cursor: pointer;
+}
+.lock-icon:hover {
+    color: black;
+}
+.time-cell {
+    position: relative;
+}
+input[type="text"] {
+    font-size: inherit;
+    padding: 2px;
+    box-sizing: border-box;
+}
+.locked {
+    background-color: gainsboro;
+    /* background-color: #f8d7da; /* Colore rosso chiaro */
+    cursor: not-allowed; /* Indica che la cella è bloccata */
+}
